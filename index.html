@@ -255,6 +255,75 @@
             border: 2px solid #ddd;
         }
 
+        /* Help modal */
+        .help-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.25);
+            border: 2px solid white;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .help-btn:hover {
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .help-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .help-overlay.open { display: flex; }
+        .help-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            position: relative;
+        }
+        .help-modal h2 { margin-top: 0; color: var(--primary); }
+        .help-modal h3 { margin: 1.2rem 0 0.4rem; color: var(--accent); }
+        .help-modal p, .help-modal li { font-size: 1rem; line-height: 1.6; }
+        .help-modal ul { padding-left: 1.2rem; }
+        .help-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #eee;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            color: #666;
+        }
+        .help-close:hover { background: #ddd; transform: scale(1.1); }
+
         @media (max-width: 700px) {
             .tabs { flex-direction: column; }
             .set-selector-bar { flex-direction: column; align-items: stretch; }
@@ -262,10 +331,48 @@
     </style>
 </head>
 <body>
-    <header>
+    <header style="position: relative;">
         <h1>📖 Sight Word Reader Tool</h1>
         <p style="margin: 8px 0 0; opacity: 0.9;">Build sight-word fluency together — one story at a time!</p>
+        <button class="help-btn" onclick="toggleHelp(true)" title="Help">?</button>
     </header>
+
+    <!-- Help Modal -->
+    <div class="help-overlay" id="help-overlay" onclick="if(event.target===this)toggleHelp(false)">
+        <div class="help-modal">
+            <button class="help-close" onclick="toggleHelp(false)">&times;</button>
+            <h2>📖 How to Use</h2>
+            <p>This tool helps your child build sight-word fluency by reading stories where key words are hidden. Tap the masked words to reveal them!</p>
+
+            <h3>1. Sight Words</h3>
+            <ul>
+                <li>Create <strong>word sets</strong> to organize sight words by level or theme.</li>
+                <li>Type words into the input box and press <strong>Add</strong>. You can add several at once separated by spaces.</li>
+                <li>Click the <strong>&times;</strong> on any word tag to remove it.</li>
+            </ul>
+
+            <h3>2. Stories</h3>
+            <ul>
+                <li>Add a <strong>title</strong>, paste or type the <strong>story text</strong>, and optionally add an <strong>illustration</strong>.</li>
+                <li>Check the <strong>word sets</strong> that apply to each story so the reader knows which words to mask.</li>
+                <li>Edit or delete stories any time from the list.</li>
+            </ul>
+
+            <h3>3. Read Together</h3>
+            <ul>
+                <li>Pick a story from the dropdown to start reading.</li>
+                <li><strong>🔒 Mask All</strong> hides every sight word. <strong>🔓 Unmask All</strong> reveals them.</li>
+                <li>Tap any <strong>yellow masked word</strong> to reveal it — it turns green when shown.</li>
+                <li>The word panels below the story show which sight words appear (and which don't).</li>
+            </ul>
+
+            <h3>Good to Know</h3>
+            <ul>
+                <li>All data is saved <strong>automatically in your browser</strong> — no account needed.</li>
+                <li>Works <strong>offline</strong> once loaded.</li>
+            </ul>
+        </div>
+    </div>
 
     <div class="tabs">
         <div class="tab active" onclick="switchTab(0)">Sight Words</div>
@@ -370,6 +477,11 @@
     </div>
 
     <script>
+        // ====================== HELP MODAL ======================
+        function toggleHelp(show) {
+            document.getElementById('help-overlay').classList.toggle('open', show);
+        }
+
         // ====================== DATA STORAGE ======================
         const defaultSightWords = ["a", "and", "big", "got", "in", "is", "lot", "next", "see", "sees", "the", "this", "what", "looks", "kids", "her", "for", "by", "said", "had", "his", "all", "was", "to"]
         const defaultStories = [
