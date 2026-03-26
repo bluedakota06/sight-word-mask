@@ -483,20 +483,28 @@
         }
 
         // ====================== DATA STORAGE ======================
-        const defaultSightWords = ["a", "and", "big", "got", "in", "is", "lot", "next", "see", "sees", "the", "this", "what", "looks", "kids", "her", "for", "by", "said", "had", "his", "all", "was", "to"]
+        const defaultWordSets = [
+            { id: 1, name: "Default Set", words: ["sees", "got", "lot", "next", "see", "this", "what", "kids", "her", "said", "had", "his", "all", "a", "and", "in", "is", "the", "for", "by", "was", "to", "big", "looks"] },
+            { id: 1774458357079, name: "Dolch Sight Words - 2nd grade", words: ["always", "around", "because", "been", "before", "best", "both", "buy", "call", "cold", "does", "don't", "fast", "first", "five", "found", "gave", "goes", "green", "its", "made", "many", "off", "or", "pull", "read", "right", "sing", "sit", "sleep", "tell", "their", "these", "those", "upon", "us", "use", "very", "wash", "which", "why", "wish", "work", "would", "write", "your"] },
+            { id: 1774459609726, name: "Dolch Sight Words - 1st grade", words: ["after", "again", "an", "any", "as", "ask", "by", "could", "every", "fly", "from", "give", "going", "had", "has", "her", "him", "his", "how", "just", "know", "let", "live", "may", "of", "old", "once", "open", "over", "put", "round", "some", "stop", "take", "thank", "them", "then", "think", "walk", "were", "when"] },
+            { id: 1774460114735, name: "Dolch Sight Words - 3rd grade", words: ["about", "better", "bring", "carry", "clean", "cut", "done", "draw", "drink", "eight", "fall", "far", "full", "got", "grow", "hold", "hot", "hurt", "if", "keep", "kind", "laugh", "light", "long", "much", "myself", "never", "only", "own", "pick", "seven", "shall", "show", "six", "small", "start", "ten", "today", "together", "try", "warm"] },
+            { id: 1774460460367, name: "Dolch Sight Words - Nouns", words: ["apple", "baby", "back", "ball", "bear", "bed", "bell", "bird", "birthday", "boat", "box", "boy", "bread", "brother", "cake", "car", "cat", "chair", "chicken", "children", "christmas", "coat", "corn", "cow", "day", "dog", "doll", "door", "duck", "egg", "eye", "farm", "farmer", "father", "feet", "fire", "fish", "floor", "flower", "game", "garden", "girl", "goodbye", "grass", "ground", "hand", "head", "hill", "home", "horse", "house", "kitty", "leg", "letter", "man", "men", "milk", "money", "morning", "mother", "name", "nest", "night", "paper", "party", "picture", "pig", "rabbit", "rain", "ring", "robin", "santa", "claus", "school", "seed", "sheep", "shoe", "sister", "snow", "song", "squirrel", "stick", "street", "sun", "table", "thing", "time", "top", "toy", "tree", "watch", "water", "way", "wind", "window", "wood"] },
+            { id: 1774460633900, name: "Dolch Sight Words - All", words: ["a", "about", "after", "again", "all", "always", "am", "an", "and", "any", "apple", "are", "around", "as", "ask", "at", "ate", "away", "baby", "back", "ball", "be", "bear", "because", "bed", "been", "before", "bell", "best", "better", "big", "bird", "birthday", "black", "blue", "boat", "both", "box", "boy", "bread", "bring", "brother", "brown", "but", "buy", "by", "cake", "call", "came", "can", "car", "carry", "cat", "chair", "chicken", "children", "christmas", "clean", "coat", "cold", "come", "corn", "could", "cow", "cut", "day", "did", "do", "does", "dog", "doll", "done", "don't", "door", "down", "draw", "drink", "duck", "eat", "egg", "eight", "every", "eye", "fall", "far", "farm", "farmer", "fast", "father", "feet", "find", "fire", "first", "fish", "five", "floor", "flower", "fly", "for", "found", "four", "from", "full", "funny", "game", "garden", "gave", "get", "girl", "give", "go", "goes", "going", "good", "goodbye", "got", "grass", "green", "ground", "grow", "had", "hand", "has", "have", "he", "head", "help", "her", "here", "hill", "him", "his", "hold", "home", "horse", "hot", "house", "how", "hurt", "i", "if", "in", "into", "is", "it", "its", "jump", "just", "keep", "kind", "kitty", "know", "laugh", "leg", "let", "letter", "light", "like", "little", "live", "long", "look", "made", "make", "man", "many", "may", "me", "men", "milk", "money", "morning", "mother", "much", "must", "my", "myself", "name", "nest", "never", "new", "night", "no", "not", "now", "of", "off", "old", "on", "once", "one", "only", "open", "or", "our", "out", "over", "own", "paper", "party", "pick", "picture", "pig", "play", "please", "pretty", "pull", "put", "rabbit", "rain", "ran", "read", "red", "ride", "right", "ring", "robin", "round", "run", "said", "santa", "claus", "saw", "say", "school", "see", "seed", "seven", "shall", "she", "sheep", "shoe", "show", "sing", "sister", "sit", "six", "sleep", "small", "snow", "so", "some", "song", "soon", "squirrel", "start", "stick", "stop", "street", "sun", "table", "take", "tell", "ten", "thank", "that", "the", "their", "them", "then", "there", "these", "they", "thing", "think", "this", "those", "three", "time", "to", "today", "together", "too", "top", "toy", "tree", "try", "two", "under", "up", "upon", "us", "use", "very", "walk", "want", "warm", "was", "wash", "watch", "water", "way", "we", "well", "went", "were", "what", "when", "where", "which", "white", "who", "why", "will", "wind", "window", "wish", "with", "wood", "work", "would", "write", "yellow", "yes", "you", "your"] },
+            { id: 1774460921616, name: "pre-k", words: ["a", "and", "away", "big", "blue", "can", "come", "down", "find", "for", "funny", "go", "help", "here", "i", "in", "is", "it", "jump", "little", "look", "make", "me", "my", "not", "one", "play", "red", "run", "said", "see", "the", "three", "to", "two", "up", "we", "where", "yellow", "you"] },
+            { id: 1774465507269, name: "Names", words: ["brent", "clint", "kim", "biscuit", "nils", "jon", "mag"] }
+        ]
         const defaultStories = [
             {
                 id: 1,
                 title: "The Big Box",
-                text: `Nils, Jon, and Mag got a big box. What
-is in the box?
-Nils looks in the box. Nils sees a hat in
-the box. Jon looks in the box. Jon sees a
-map in the box. Mag looks in the box.
-Mag sees a book in the box.
-Next, the kids see pots and pans and
-bats in the box. A lot is in this box!`,
-                setIds: [1]
+                text: `Nils, Jon, and Mag got a big box. What is in the box?
+
+Nils looks in the box. Nils sees a hat in the box. Jon looks in the box. Jon sees a
+map in the box. Mag looks in the box. Mag sees a book in the box.
+
+Next, the kids see pots and pans and bats in the box. A lot is in this box!`,
+                setIds: [1774458357079, 1774459609726, 1774460114735, 1774460633900, 1774460921616, 1774465507269],
+                image: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhUSEhIWFhUSFRUVFxcWFRcWFRUVFxUWFhcVFxgYHSggGBolGxcVITEhJSorLi4uFx8zODMtNygtLisBCgoKDg0OGxAQGysmICUvMCstLi0tLS0tMi0tLystKystLS0tLS0tLy0rLS0tLS0tLS0vLSstLy0tLSsrLS0tLf/AABEIAOEA4QMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABAYBAwUCB//EADwQAAIBAgMEBwYFAgYDAAAAAAABAgMREiExBAVBUQYiYXGBkaETMkKxwdEjUnLh8JSyM0NigpLxBxSi/8QAGQEBAAMBAQAAAAAAAAAAAAAAAAECAwQF/8QAJhEBAQACAgICAQQDAQAAAAAAAAECAxExEiEyQWFRkfDxBBNxIv/aAAwDAQACEQMRAD8A+4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/9k="
             },
             {
                 id: 2,
@@ -512,12 +520,13 @@ They called the number. A boy answered and said, "That is my dog! I have been lo
 The boy came to the park and got his dog. Biscuit jumped and licked the boy's face. Kim was happy. She helped a lost dog find his way home.
 
 "That was a good thing you did," her dad said. Kim smiled. It felt good to help.`,
-                setIds: [1]
+                setIds: [1, 1774458357079, 1774459609726, 1774460114735, 1774460460367, 1774460633900, 1774460921616, 1774465507269],
+                image: "data:image/jpeg;base64,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"
             }
         ]
 
-        let wordSets = [{ id: 1, name: "Default Set", words: [...defaultSightWords] }]
-        let stories = [...defaultStories]
+        let wordSets = defaultWordSets.map(s => ({...s, words: [...s.words]}))
+        let stories = defaultStories.map(s => ({...s, setIds: [...s.setIds]}))
         let currentSetId = 1
         let currentEditingId = null
         let currentStoryId = null
@@ -577,7 +586,7 @@ The boy came to the park and got his dog. Biscuit jumped and licked the boy's fa
                 // Migrate old format
                 const oldWords = JSON.parse(oldSight)
                 // Merge defaults
-                defaultSightWords.forEach(w => {
+                defaultWordSets[0].words.forEach(w => {
                     if (!oldWords.includes(w)) oldWords.push(w)
                 })
                 wordSets = [{ id: 1, name: "Default Set", words: oldWords }]
