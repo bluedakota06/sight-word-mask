@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sight Word Reader Tool</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --accent: #f5a623;
+            --success: #7ed321;
+        }
+        body {
+            font-family: "Comic Sans MS", "Arial Rounded MT Bold", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #fff9e6, #e6f7ff);
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .tabs {
+            display: flex;
+            background: #fff;
+            border-bottom: 3px solid #ddd;
+        }
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        input, textarea, select, button {
+            font-family: inherit;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 1.1rem;
+        }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: #357abd;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.95rem;
+        }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #6bc01a; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .sight-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .sight-tag {
+            background: #fff3cd;
+            padding: 6px 14px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .story-card {
+            border: 2px solid #ddd;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .reading-area {
+            background: #fff;
+            border: 4px dashed #ffd700;
+            border-radius: 16px;
+            padding: 2rem;
+            min-height: 400px;
+            font-size: 1.4rem;
+            line-height: 2.2;
+            white-space: pre-wrap;
+        }
+        .sight-word {
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .sight-word.revealed {
+            background: #c1f0c1;
+            color: #222;
+        }
+        .sight-word.masked {
+            background: #ffe066;
+            color: transparent;
+            user-select: none;
+        }
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .word-item {
+            background: #f0f8ff;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Set selector bar */
+        .set-selector-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            padding: 10px 14px;
+            background: #f0f8ff;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+        .set-selector-bar select {
+            flex: 1;
+            min-width: 150px;
+        }
+        .set-selector-bar button {
+            white-space: nowrap;
+        }
+
+        /* Set badges on story cards */
+        .set-badge {
+            display: inline-block;
+            background: #e0ecff;
+            color: #3366aa;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 4px;
+            margin-top: 4px;
+        }
+
+        /* Set checkbox labels */
+        .set-checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: #f0f8ff;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .set-checkbox-label:hover {
+            background: #d6ebff;
+        }
+        .set-checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Set checkboxes container */
+        .set-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        /* Story illustration in reading view */
+        .story-illustration {
+            display: block;
+            max-width: 100%;
+            max-height: 300px;
+            margin: 0 auto 1.5rem;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        /* Thumbnail on story cards */
+        .story-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* Image preview in form */
+        .image-preview {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .image-preview img {
+            max-width: 120px;
+            max-height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+
+        @media (max-width: 700px) {
+            .tabs { flex-direction: column; }
+            .set-selector-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📖 Sight Word Reader Tool</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9;">Build sight-word fluency together — one story at a time!</p>
+    </header>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab(0)">Sight Words</div>
+        <div class="tab" onclick="switchTab(1)">Stories</div>
+        <div class="tab" onclick="switchTab(2)">Read Together</div>
+    </div>
+
+    <div class="container">
+
+        <!-- TAB 0: Sight Words -->
+        <div id="tab-0" class="tab-content">
+            <div class="card">
+                <h2>🌟 Your Sight Word Sets</h2>
+                <p>Organize sight words into named sets and assign them to stories.</p>
+
+                <div id="set-selector-bar" class="set-selector-bar"></div>
+
+                <div style="display:flex; gap:12px; margin-bottom:1rem;">
+                    <input id="new-sight" type="text" placeholder="Add sight words (e.g. the and is)" style="flex:1;" onkeydown="if(event.key==='Enter') addSightWord()">
+                    <button onclick="addSightWord()">+ Add</button>
+                </div>
+
+                <div id="sight-list" class="sight-list"></div>
+            </div>
+        </div>
+
+        <!-- TAB 1: Stories -->
+        <div id="tab-1" class="tab-content" style="display:none;">
+            <div class="card">
+                <h2>📚 Your Stories</h2>
+
+                <!-- Add / Edit Form -->
+                <div style="margin-bottom: 2rem;">
+                    <input id="story-title" type="text" placeholder="Story title (e.g. The Big Box)" style="width:100%; margin-bottom:8px;">
+                    <div style="margin-bottom:8px;">
+                        <label style="font-size:1rem; color:#555;">Illustration: </label>
+                        <input type="file" id="story-image" accept="image/*" onchange="previewStoryImage(this)">
+                    </div>
+                    <div id="image-preview-container" class="image-preview" style="display:none;">
+                        <img id="image-preview-img" src="" alt="Preview">
+                        <button onclick="removeStoryImage()" class="btn-small btn-danger">Remove</button>
+                    </div>
+                    <textarea id="story-text" rows="6" placeholder="Paste or type your story here..." style="width:100%; resize:vertical;"></textarea>
+
+                    <div id="story-set-checkboxes" style="margin-top:10px;"></div>
+
+                    <div style="display:flex; gap:12px; margin-top:12px;">
+                        <button onclick="saveStory()" id="save-story-btn">Save Story</button>
+                        <button onclick="cancelEdit()" class="btn-small" style="background:#aaa;">Cancel</button>
+                    </div>
+                </div>
+
+                <h3>Stored Stories</h3>
+                <div id="stories-list"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Read Together -->
+        <div id="tab-2" class="tab-content" style="display:none;">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2 id="current-story-title">Select a story to begin reading!</h2>
+                    <select id="story-select" onchange="loadSelectedStory()" style="padding:10px; font-size:1.1rem;">
+                        <option value="">— Choose a story —</option>
+                    </select>
+                </div>
+
+                <div id="reading-active-sets" style="display:none; margin-bottom:1rem;"></div>
+
+                <div style="display:flex; gap:12px; margin-bottom:1rem; flex-wrap:wrap;">
+                    <button onclick="maskAll()" class="btn-small">🔒 Mask All Sight Words</button>
+                    <button onclick="unmaskAll()" class="btn-small">🔓 Unmask All Sight Words</button>
+                    <button onclick="resetReading()" class="btn-small" style="background:#aaa;">Reset View</button>
+                </div>
+
+                <!-- Story illustration -->
+                <div id="reading-illustration" style="display:none; text-align:center;">
+                    <img id="reading-illustration-img" class="story-illustration" src="" alt="Story illustration">
+                </div>
+
+                <!-- Reading area -->
+                <div id="reading-area" class="reading-area"></div>
+
+                <!-- Unique sight words in this story -->
+                <div id="story-word-panel" style="margin-top:2rem; display:none;">
+                    <h3>Sight Words in This Story</h3>
+                    <div id="unique-words" class="word-list"></div>
+                </div>
+
+                <!-- Sight words NOT in this story -->
+                <div id="missing-word-panel" style="margin-top:1.5rem; display:none;">
+                    <h3 style="color:#999;">Sight Words Not in This Story</h3>
+                    <div id="missing-words" class="word-list"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Made for Leo &amp; family ❤️ • Data saved automatically in your browser • Works offline
+    </div>
+
+    <script>
+        // ====================== DATA STORAGE ======================
+        const defaultSightWords = ["a", "and", "big", "got", "in", "is", "lot", "next", "see", "sees", "the", "this", "what", "looks", "kids", "her", "for", "by", "said", "had", "his", "all", "was", "to"]
+        const defaultStories = [
+            {
+                id: 1,
+                title: "The Big Box",
+                text: `Nils, Jon, and Mag got a big box. What
+is in the box?
+Nils looks in the box. Nils sees a hat in
+the box. Jon looks in the box. Jon sees a
+map in the box. Mag looks in the box.
+Mag sees a book in the box.
+Next, the kids see pots and pans and
+bats in the box. A lot is in this box!`,
+                setIds: [1]
+            },
+            {
+                id: 2,
+                title: "The Lost Dog",
+                text: `Kim and her dad went for a walk in the park. They saw a little dog sitting by a tree. The dog looked sad and lost.
+
+"What should we do?" Kim asked her dad.
+
+"Let's see if the dog has a tag," her dad said. Kim looked and saw a tag on the dog. It said "Biscuit" and had a number on it.
+
+They called the number. A boy answered and said, "That is my dog! I have been looking for him all day!"
+
+The boy came to the park and got his dog. Biscuit jumped and licked the boy's face. Kim was happy. She helped a lost dog find his way home.
+
+"That was a good thing you did," her dad said. Kim smiled. It felt good to help.`,
+                setIds: [1]
+            }
+        ]
+
+        let wordSets = [{ id: 1, name: "Default Set", words: [...defaultSightWords] }]
+        let stories = [...defaultStories]
+        let currentSetId = 1
+        let currentEditingId = null
+        let currentStoryId = null
+        let currentSpans = []
+        let activeReadingSets = {} // { setId: true/false } for reading tab toggles
+        let disabledReadingWords = new Set() // words disabled by user in reading view
+
+        // ====================== HELPER FUNCTIONS ======================
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        }
+
+        function nextId() {
+            return Date.now()
+        }
+
+        function getWordsForStory(storyId) {
+            const story = stories.find(s => s.id === storyId)
+            if (!story) return []
+
+            let setIds = story.setIds && story.setIds.length > 0
+                ? story.setIds
+                : wordSets.map(s => s.id) // fall back to all sets
+
+            const words = new Set()
+            setIds.forEach(sid => {
+                const ws = wordSets.find(s => s.id === sid)
+                if (ws) ws.words.forEach(w => words.add(w))
+            })
+            return [...words]
+        }
+
+        function getActiveReadingWords() {
+            const words = new Set()
+            Object.keys(activeReadingSets).forEach(sid => {
+                if (activeReadingSets[sid]) {
+                    const ws = wordSets.find(s => s.id === parseInt(sid))
+                    if (ws) ws.words.forEach(w => { if (!disabledReadingWords.has(w)) words.add(w) })
+                }
+            })
+            return [...words]
+        }
+
+        function getCurrentSet() {
+            return wordSets.find(s => s.id === currentSetId)
+        }
+
+        // ====================== DATA PERSISTENCE ======================
+        function loadData() {
+            // Migration: old flat sightWords → wordSets
+            const oldSight = localStorage.getItem('sightWords')
+            const savedSets = localStorage.getItem('wordSets')
+
+            if (savedSets) {
+                wordSets = JSON.parse(savedSets)
+            } else if (oldSight) {
+                // Migrate old format
+                const oldWords = JSON.parse(oldSight)
+                // Merge defaults
+                defaultSightWords.forEach(w => {
+                    if (!oldWords.includes(w)) oldWords.push(w)
+                })
+                wordSets = [{ id: 1, name: "Default Set", words: oldWords }]
+                localStorage.removeItem('sightWords')
+            }
+            // else: use the default wordSets already set
+
+            const savedStories = localStorage.getItem('stories')
+            if (savedStories) {
+                stories = JSON.parse(savedStories)
+                // Merge in any new default stories by id
+                const existingIds = new Set(stories.map(s => s.id))
+                defaultStories.forEach(ds => {
+                    if (!existingIds.has(ds.id)) stories.push(ds)
+                })
+                // Ensure all stories have setIds
+                stories.forEach(s => {
+                    if (!s.setIds) s.setIds = [1]
+                })
+            }
+
+            currentSetId = wordSets.length > 0 ? wordSets[0].id : 1
+            saveData()
+        }
+
+        function saveData() {
+            localStorage.setItem('wordSets', JSON.stringify(wordSets))
+            localStorage.setItem('stories', JSON.stringify(stories))
+        }
+
+        // ====================== SIGHT WORDS TAB ======================
+        function renderSetSelector() {
+            const bar = document.getElementById('set-selector-bar')
+            bar.innerHTML = ''
+
+            const select = document.createElement('select')
+            select.id = 'set-select'
+            select.onchange = function() { switchSet(parseInt(this.value)) }
+            wordSets.forEach(s => {
+                const opt = document.createElement('option')
+                opt.value = s.id
+                opt.textContent = s.name + ' (' + s.words.length + ' words)'
+                if (s.id === currentSetId) opt.selected = true
+                select.appendChild(opt)
+            })
+            bar.appendChild(select)
+
+            const btnNew = document.createElement('button')
+            btnNew.className = 'btn-small'
+            btnNew.textContent = '+ New Set'
+            btnNew.onclick = createNewSet
+            bar.appendChild(btnNew)
+
+            const btnRename = document.createElement('button')
+            btnRename.className = 'btn-small'
+            btnRename.style.background = '#f5a623'
+            btnRename.textContent = 'Rename'
+            btnRename.onclick = renameSet
+            bar.appendChild(btnRename)
+
+            if (wordSets.length > 1) {
+                const btnDelete = document.createElement('button')
+                btnDelete.className = 'btn-small btn-danger'
+                btnDelete.textContent = 'Delete Set'
+                btnDelete.onclick = deleteSet
+                bar.appendChild(btnDelete)
+            }
+        }
+
+        function switchSet(id) {
+            currentSetId = id
+            renderSetSelector()
+            renderSightWords()
+        }
+
+        function createNewSet() {
+            const name = prompt('Name for the new sight word set:')
+            if (!name || !name.trim()) return
+            const newSet = { id: nextId(), name: name.trim(), words: [] }
+            wordSets.push(newSet)
+            stories.forEach(s => { if (!s.setIds) s.setIds = []; s.setIds.push(newSet.id) })
+            currentSetId = newSet.id
+            saveData()
+            renderSetSelector()
+            renderSightWords()
+        }
+
+        function renameSet() {
+            const set = getCurrentSet()
+            if (!set) return
+            const name = prompt('Rename set:', set.name)
+            if (!name || !name.trim()) return
+            set.name = name.trim()
+            saveData()
+            renderSetSelector()
+        }
+
+        function deleteSet() {
+            const set = getCurrentSet()
+            if (!set) return
+            if (wordSets.length <= 1) {
+                alert('Cannot delete the last set.')
+                return
+            }
+            if (!confirm(`Delete the set "${set.name}" and all its words?`)) return
+
+            const deletedId = set.id
+            wordSets = wordSets.filter(s => s.id !== deletedId)
+
+            // Remove from all stories' setIds
+            stories.forEach(s => {
+                s.setIds = (s.setIds || []).filter(id => id !== deletedId)
+            })
+
+            currentSetId = wordSets[0].id
+            saveData()
+            renderSetSelector()
+            renderSightWords()
+        }
+
+        function renderSightWords() {
+            const container = document.getElementById('sight-list')
+            container.innerHTML = ''
+
+            const set = getCurrentSet()
+            if (!set) return
+
+            set.words.forEach((word, index) => {
+                const tag = document.createElement('div')
+                tag.className = 'sight-tag'
+                tag.innerHTML = `
+                    <span>${word}</span>
+                    <button onclick="removeSightWord(${index}); event.stopImmediatePropagation()" style="background:none; border:none; font-size:1.3rem; line-height:1; color:#e74c3c;">×</button>
+                `
+                container.appendChild(tag)
+            })
+
+            if (set.words.length === 0) {
+                container.innerHTML = `<p style="color:#888; font-style:italic;">No sight words in this set yet. Add some above!</p>`
+            }
+        }
+
+        function addSightWord() {
+            const input = document.getElementById('new-sight')
+            const raw = input.value.trim().toLowerCase()
+            if (!raw) return
+
+            const set = getCurrentSet()
+            if (!set) return
+
+            const newWords = raw.split(/\s+/).filter(w => w && !set.words.includes(w))
+            if (newWords.length === 0) {
+                alert('All words are already in this set!')
+                return
+            }
+            newWords.forEach(w => set.words.push(w))
+            saveData()
+            renderSetSelector()
+            renderSightWords()
+            input.value = ''
+        }
+
+        function removeSightWord(index) {
+            const set = getCurrentSet()
+            if (!set) return
+            if (confirm(`Remove "${set.words[index]}" from "${set.name}"?`)) {
+                set.words.splice(index, 1)
+                saveData()
+                renderSetSelector()
+                renderSightWords()
+                if (currentStoryId) loadSelectedStory()
+            }
+        }
+
+        // ====================== IMAGE HANDLING ======================
+        let pendingImageDataUrl = null
+
+        function previewStoryImage(input) {
+            const file = input.files[0]
+            if (!file) return
+            const reader = new FileReader()
+            reader.onload = function(e) {
+                pendingImageDataUrl = e.target.result
+                document.getElementById('image-preview-img').src = pendingImageDataUrl
+                document.getElementById('image-preview-container').style.display = 'flex'
+            }
+            reader.readAsDataURL(file)
+        }
+
+        function removeStoryImage() {
+            pendingImageDataUrl = null
+            document.getElementById('image-preview-img').src = ''
+            document.getElementById('image-preview-container').style.display = 'none'
+            document.getElementById('story-image').value = ''
+        }
+
+        // ====================== STORIES TAB ======================
+        function renderStorySetCheckboxes(selectedSetIds) {
+            const container = document.getElementById('story-set-checkboxes')
+            if (wordSets.length === 0) {
+                container.innerHTML = ''
+                return
+            }
+
+            let html = '<strong>Sight Word Sets:</strong><div class="set-checkboxes">'
+            wordSets.forEach(s => {
+                const checked = selectedSetIds.includes(s.id) ? 'checked' : ''
+                html += `<label class="set-checkbox-label">
+                    <input type="checkbox" value="${s.id}" ${checked} class="story-set-cb">
+                    ${s.name}
+                </label>`
+            })
+            html += '</div>'
+            container.innerHTML = html
+        }
+
+        function getCheckedStorySetIds() {
+            const cbs = document.querySelectorAll('.story-set-cb:checked')
+            return Array.from(cbs).map(cb => parseInt(cb.value))
+        }
+
+        function renderStories() {
+            const container = document.getElementById('stories-list')
+            container.innerHTML = ''
+
+            stories.forEach(story => {
+                const div = document.createElement('div')
+                div.className = 'story-card'
+
+                // Build set badges
+                let badges = ''
+                ;(story.setIds || []).forEach(sid => {
+                    const ws = wordSets.find(s => s.id === sid)
+                    if (ws) badges += `<span class="set-badge">${ws.name}</span>`
+                })
+
+                const thumbnail = story.image
+                    ? `<img src="${story.image}" class="story-thumbnail" alt="">`
+                    : ''
+
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                        ${thumbnail}
+                        <div>
+                            <strong>${story.title}</strong><br>
+                            <span style="font-size:0.9rem; color:#666;">${story.text.substring(0, 80)}…</span>
+                            <div style="margin-top:4px;">${badges}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-shrink:0;">
+                        <button onclick="editStory(${story.id})" class="btn-small">Edit</button>
+                        <button onclick="deleteStory(${story.id})" class="btn-small" style="background:#e74c3c;">Delete</button>
+                        <button onclick="useStoryInReading(${story.id})" class="btn-small btn-success">Read Now</button>
+                    </div>
+                `
+                container.appendChild(div)
+            })
+
+            if (stories.length === 0) {
+                container.innerHTML = `<p style="color:#888;">No stories yet. Add one in the form above!</p>`
+            }
+
+            // Render checkboxes for the form (default: all sets checked for new story)
+            if (!currentEditingId) {
+                renderStorySetCheckboxes(wordSets.map(s => s.id))
+            }
+        }
+
+        function saveStory() {
+            const title = document.getElementById('story-title').value.trim()
+            const text = document.getElementById('story-text').value.trim()
+
+            if (!title || !text) {
+                alert('Please enter both a title and story text.')
+                return
+            }
+
+            const setIds = getCheckedStorySetIds()
+
+            if (currentEditingId) {
+                const story = stories.find(s => s.id === currentEditingId)
+                if (story) {
+                    story.title = title
+                    story.text = text
+                    story.setIds = setIds
+                    story.image = pendingImageDataUrl || undefined
+                }
+            } else {
+                const newStory = {
+                    id: nextId(),
+                    title: title,
+                    text: text,
+                    setIds: setIds
+                }
+                if (pendingImageDataUrl) newStory.image = pendingImageDataUrl
+                stories.push(newStory)
+            }
+
+            saveData()
+            renderStories()
+            cancelEdit()
+
+            if (stories.length === 1) {
+                switchTab(2)
+            }
+        }
+
+        function editStory(id) {
+            const story = stories.find(s => s.id === id)
+            if (!story) return
+            currentEditingId = id
+            document.getElementById('story-title').value = story.title
+            document.getElementById('story-text').value = story.text
+            document.getElementById('save-story-btn').textContent = 'Update Story'
+            renderStorySetCheckboxes(story.setIds || [])
+            if (story.image) {
+                pendingImageDataUrl = story.image
+                document.getElementById('image-preview-img').src = story.image
+                document.getElementById('image-preview-container').style.display = 'flex'
+            } else {
+                removeStoryImage()
+            }
+        }
+
+        function cancelEdit() {
+            currentEditingId = null
+            document.getElementById('story-title').value = ''
+            document.getElementById('story-text').value = ''
+            document.getElementById('save-story-btn').textContent = 'Save Story'
+            renderStorySetCheckboxes(wordSets.map(s => s.id))
+            removeStoryImage()
+        }
+
+        function deleteStory(id) {
+            if (confirm('Delete this story permanently?')) {
+                stories = stories.filter(s => s.id !== id)
+                saveData()
+                renderStories()
+                if (currentStoryId === id) {
+                    currentStoryId = null
+                    document.getElementById('reading-area').innerHTML = '<p style="text-align:center; color:#888; font-size:1.5rem;">Story deleted.<br>Choose another one to read!</p>'
+                    document.getElementById('reading-active-sets').style.display = 'none'
+                }
+            }
+        }
+
+        function useStoryInReading(id) {
+            currentStoryId = id
+            switchTab(2)
+            document.getElementById('story-select').value = id
+            loadSelectedStory()
+        }
+
+        // ====================== READING TAB ======================
+        function populateStorySelect() {
+            const select = document.getElementById('story-select')
+            select.innerHTML = `<option value="">— Choose a story —</option>`
+            stories.forEach(story => {
+                const opt = document.createElement('option')
+                opt.value = story.id
+                opt.textContent = story.title
+                select.appendChild(opt)
+            })
+        }
+
+        function renderActiveSetToggles() {
+            const container = document.getElementById('reading-active-sets')
+            if (!currentStoryId) {
+                container.style.display = 'none'
+                return
+            }
+
+            const story = stories.find(s => s.id === currentStoryId)
+            if (!story) return
+
+            // Determine which sets apply to this story
+            let relevantSetIds = story.setIds && story.setIds.length > 0
+                ? story.setIds
+                : wordSets.map(s => s.id)
+
+            const relevantSets = wordSets.filter(s => relevantSetIds.includes(s.id))
+            if (relevantSets.length === 0) {
+                container.style.display = 'none'
+                return
+            }
+
+            // Initialize activeReadingSets for this story
+            activeReadingSets = {}
+            disabledReadingWords = new Set()
+            relevantSets.forEach(s => { activeReadingSets[s.id] = false })
+
+            container.style.display = 'block'
+            let html = '<strong>Active Sets:</strong> <div class="set-checkboxes" style="display:inline-flex;">'
+            relevantSets.forEach(s => {
+                html += `<label class="set-checkbox-label">
+                    <input type="checkbox" onchange="toggleReadingSet(${s.id}, this.checked)" class="reading-set-cb">
+                    ${s.name}
+                </label>`
+            })
+            html += '</div>'
+            container.innerHTML = html
+        }
+
+        function toggleReadingSet(setId, checked) {
+            activeReadingSets[setId] = checked
+            // Re-render story text with new word list
+            const story = stories.find(s => s.id === currentStoryId)
+            if (story) {
+                renderStoryText(story.text, getActiveReadingWords())
+                renderUniqueWordPanel()
+            }
+        }
+
+        function loadSelectedStory() {
+            const select = document.getElementById('story-select')
+            const id = parseInt(select.value)
+            if (!id) return
+            currentStoryId = id
+            const story = stories.find(s => s.id === id)
+            if (!story) return
+
+            document.getElementById('current-story-title').innerHTML = `📖 ${story.title}`
+
+            const illustrationContainer = document.getElementById('reading-illustration')
+            if (story.image) {
+                document.getElementById('reading-illustration-img').src = story.image
+                illustrationContainer.style.display = 'block'
+            } else {
+                illustrationContainer.style.display = 'none'
+            }
+
+            renderActiveSetToggles()
+
+            const words = getActiveReadingWords()
+            renderStoryText(story.text, words)
+            renderUniqueWordPanel()
+        }
+
+        function renderStoryText(text, words) {
+            const container = document.getElementById('reading-area')
+
+            if (!words || words.length === 0) {
+                container.innerHTML = text
+                currentSpans = []
+                return
+            }
+
+            let processed = text
+
+            // Sort sight words by length (longest first) to avoid partial matches
+            const sortedSight = [...words].sort((a, b) => b.length - a.length)
+
+            sortedSight.forEach(word => {
+                const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi')
+                processed = processed.replace(regex, (match) => {
+                    // Skip all-uppercase matches (abbreviations like "US", "UK")
+                    if (match.length > 1 && match === match.toUpperCase()) return match
+                    return `<span class="sight-word revealed" data-original="${match.replace(/"/g, '&quot;')}">${match}</span>`
+                })
+            })
+
+            container.innerHTML = processed
+
+            currentSpans = Array.from(container.querySelectorAll('.sight-word'))
+            currentSpans.forEach(span => {
+                span.addEventListener('click', function () {
+                    toggleSingleWord(this)
+                })
+            })
+        }
+
+        function toggleSingleWord(span) {
+            const original = span.dataset.original
+            if (span.classList.contains('revealed')) {
+                const maskText = '_'.repeat(original.length)
+                span.innerHTML = maskText
+                span.classList.remove('revealed')
+                span.classList.add('masked')
+            } else {
+                span.innerHTML = original
+                span.classList.remove('masked')
+                span.classList.add('revealed')
+            }
+        }
+
+        function maskAll() {
+            currentSpans.forEach(span => {
+                if (span.classList.contains('revealed')) {
+                    const original = span.dataset.original
+                    const maskText = '_'.repeat(original.length)
+                    span.innerHTML = maskText
+                    span.classList.remove('revealed')
+                    span.classList.add('masked')
+                }
+            })
+        }
+
+        function unmaskAll() {
+            currentSpans.forEach(span => {
+                if (span.classList.contains('masked')) {
+                    const original = span.dataset.original
+                    span.innerHTML = original
+                    span.classList.remove('masked')
+                    span.classList.add('revealed')
+                }
+            })
+        }
+
+        function resetReading() {
+            const select = document.getElementById('story-select')
+            if (select.value) loadSelectedStory()
+        }
+
+        function renderUniqueWordPanel() {
+            const panel = document.getElementById('story-word-panel')
+            const container = document.getElementById('unique-words')
+            container.innerHTML = ''
+
+            const missingPanel = document.getElementById('missing-word-panel')
+            const missingContainer = document.getElementById('missing-words')
+
+            if (!currentStoryId) { missingPanel.style.display = 'none'; missingContainer.innerHTML = ''; return }
+
+            const story = stories.find(s => s.id === currentStoryId)
+            if (!story) { missingPanel.style.display = 'none'; missingContainer.innerHTML = ''; return }
+
+            // Get all words from active sets (including disabled ones for display)
+            const allActiveSetWords = new Set()
+            Object.keys(activeReadingSets).forEach(sid => {
+                if (activeReadingSets[sid]) {
+                    const ws = wordSets.find(s => s.id === parseInt(sid))
+                    if (ws) ws.words.forEach(w => allActiveSetWords.add(w))
+                }
+            })
+
+            const unique = new Map()
+
+            allActiveSetWords.forEach(word => {
+                // Count only non-abbreviation matches
+                const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi')
+                const matches = (story.text.match(regex) || []).filter(m => !(m.length > 1 && m === m.toUpperCase()))
+                if (matches.length > 0) unique.set(word, matches.length)
+            })
+
+            if (unique.size === 0) {
+                panel.style.display = 'none'
+                missingPanel.style.display = 'none'
+                document.getElementById('missing-words').innerHTML = ''
+                return
+            }
+
+            panel.style.display = 'block'
+
+            const sortedUnique = [...unique.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+            sortedUnique.forEach(([word, count]) => {
+                const isDisabled = disabledReadingWords.has(word)
+                const div = document.createElement('div')
+                div.className = 'word-item'
+                if (isDisabled) div.style.opacity = '0.45'
+                div.innerHTML = isDisabled
+                    ? `<strong style="text-decoration:line-through;">${word}</strong>
+                       <span style="font-size:0.9rem; color:#555;">×${count}</span>
+                       <button onclick="enableWord('${word}'); event.stopImmediatePropagation()" class="btn-small btn-success">Enable</button>`
+                    : `<strong>${word}</strong>
+                       <span style="font-size:0.9rem; color:#555;">×${count}</span>
+                       <button onclick="maskWord('${word}'); event.stopImmediatePropagation()" class="btn-small">Mask</button>
+                       <button onclick="unmaskWord('${word}'); event.stopImmediatePropagation()" class="btn-small btn-success">Unmask</button>
+                       <button onclick="disableWord('${word}'); event.stopImmediatePropagation()" class="btn-small btn-danger" style="font-size:0.85rem;">Disable</button>`
+                container.appendChild(div)
+            })
+
+            // Render words NOT in this story
+            missingContainer.innerHTML = ''
+
+            const missing = [...allActiveSetWords].filter(w => !unique.has(w)).sort((a, b) => a.localeCompare(b))
+            if (missing.length === 0) {
+                missingPanel.style.display = 'none'
+                return
+            }
+
+            missingPanel.style.display = 'block'
+            missing.forEach(word => {
+                const div = document.createElement('div')
+                div.className = 'word-item'
+                div.style.opacity = '0.6'
+                div.innerHTML = `<strong>${word}</strong>`
+                missingContainer.appendChild(div)
+            })
+        }
+
+        function maskWord(word) {
+            currentSpans.forEach(span => {
+                if (span.dataset.original.toLowerCase() === word) {
+                    const maskText = '_'.repeat(span.dataset.original.length)
+                    span.innerHTML = maskText
+                    span.classList.remove('revealed')
+                    span.classList.add('masked')
+                }
+            })
+        }
+
+        function unmaskWord(word) {
+            currentSpans.forEach(span => {
+                if (span.dataset.original.toLowerCase() === word) {
+                    span.innerHTML = span.dataset.original
+                    span.classList.remove('masked')
+                    span.classList.add('revealed')
+                }
+            })
+        }
+
+        function disableWord(word) {
+            disabledReadingWords.add(word)
+            const story = stories.find(s => s.id === currentStoryId)
+            if (story) {
+                renderStoryText(story.text, getActiveReadingWords())
+                renderUniqueWordPanel()
+            }
+        }
+
+        function enableWord(word) {
+            disabledReadingWords.delete(word)
+            const story = stories.find(s => s.id === currentStoryId)
+            if (story) {
+                renderStoryText(story.text, getActiveReadingWords())
+                renderUniqueWordPanel()
+            }
+        }
+
+        // ====================== TAB SWITCHING ======================
+        function switchTab(n) {
+            document.querySelectorAll('.tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === n)
+            })
+            document.querySelectorAll('.tab-content').forEach((content, i) => {
+                content.style.display = i === n ? 'block' : 'none'
+            })
+
+            if (n === 0) {
+                renderSetSelector()
+                renderSightWords()
+            }
+            if (n === 1) renderStories()
+            if (n === 2) {
+                populateStorySelect()
+                if (currentStoryId) {
+                    document.getElementById('story-select').value = currentStoryId
+                    loadSelectedStory()
+                }
+            }
+        }
+
+        // ====================== INITIALIZE APP ======================
+        function init() {
+            loadData()
+            renderSetSelector()
+            renderSightWords()
+            renderStories()
+            populateStorySelect()
+
+            console.log('%c✅ Sight Word Reader Tool ready!', 'color:#4a90e2; font-size:1.2rem')
+        }
+
+        window.onload = init
+    </script>
+</body>
+</html>
